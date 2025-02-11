@@ -48,22 +48,15 @@ def strip_tags(html: str):
 
 
 atom_types_mapping = {
-    "apk": "Unknown",
     "as": "Autonomous-System",
-    "cc": "Payment-Card",
+    "certificate": "X509-Certificate",
     "crypto": "Cryptocurrency-Wallet",
-    "cve": "Unknown",
     "domain": "Domain-Name",
     "email": "Email-Addr",
     "file": "StixFile",
-    "fqdn": "Hostname",
-    "iban": "Bank-Account",
     "ip": "IPv4-Addr",
     "ip_range": "IPv4-Addr",
-    "paste": "Text",
     "phone_number": "Phone-Number",
-    "regkey": "Windows-Registry-Key",
-    "ssl": "X509-Certificate",
     "url": "Url",
 }
 
@@ -221,7 +214,7 @@ class OrangeCyberDefense:
         )
         self.helper = OpenCTIConnectorHelper(config)
         self.ocd_datalake_api_url = (
-            "https://datalake.cert.orangecyberdefense.com/api/v2"
+            "https://ti2.extranet.mrti-center.com/api/v3"
         )
         self.ocd_datalake_token = get_config_variable(
             "OCD_DATALAKE_TOKEN", ["ocd", "datalake_token"], config
@@ -365,7 +358,7 @@ class OrangeCyberDefense:
             for external_reference in object["external_references"]:
                 if "url" in external_reference:
                     external_reference["url"] = external_reference["url"].replace(
-                        "api/v2/mrti/threats", "gui/threat"
+                        "api/v3/mrti/threats", "gui/threat"
                     )
                     external_references.append(external_reference)
                 else:
@@ -460,7 +453,7 @@ class OrangeCyberDefense:
 
         for tag in tags:
             try:
-                url = "https://datalake.cert.orangecyberdefense.com/api/v2/mrti/tag-subcategory/filtered/"
+                url = f"{self.ocd_datalake_api_url}/mrti/threat-entity/filtered/"
                 payload = json.dumps(
                     {
                         "limit": "5000",
@@ -856,7 +849,7 @@ class OrangeCyberDefense:
     def _import_threat_library(self):
         current_state = self.helper.get_state()
 
-        url = "https://datalake.cert.orangecyberdefense.com/api/v2/mrti/tag-subcategory/filtered/"
+        url = f"{self.ocd_datalake_api_url}/mrti/threat-entity/filtered/"
         payload = json.dumps({"limit": "500", "offset": "0", "ordering": "-updated_at"})
         headers = {
             "Accept": "application/stix+json",
