@@ -297,7 +297,7 @@ class OrangeCyberDefense:
             x_opencti_order=99,
             x_opencti_color="#ff7900",
         )
-        self.datalake_instance = Datalake(longterm_token=self.ocd_datalake_token)
+        self.datalake_instance = Datalake(longterm_token=self.ocd_datalake_token, env="preprod")
         self.cache = {}
 
     def _generate_indicator_note(self, indicator_object):
@@ -850,7 +850,13 @@ class OrangeCyberDefense:
         current_state = self.helper.get_state()
 
         url = f"{self.ocd_datalake_api_url}/mrti/threat-entity/filtered/"
-        payload = json.dumps({"limit": "500", "offset": "0", "ordering": "-updated_at"})
+        payload = json.dumps(
+            {
+                "limit": "500", 
+                "offset": "0", 
+                "ordering": "-updated_at",
+            }
+        )
         headers = {
             "Accept": "application/stix+json",
             "Content-Type": "application/json",
