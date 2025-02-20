@@ -214,7 +214,11 @@ class OrangeCyberDefense:
         )
         self.helper = OpenCTIConnectorHelper(config)
         self.ocd_datalake_api_url = (
+            "https://datalake.cert.orangecyberdefense.com/api/v3" if self.ocd_datalake_env == "prod" else
             "https://ti2.extranet.mrti-center.com/api/v3"
+        )
+        self.ocd_datalake_env = get_config_variable(
+            "OCD_DATALAKE_ENV", ["ocd", "datalake_env"], config
         )
         self.ocd_datalake_token = get_config_variable(
             "OCD_DATALAKE_TOKEN", ["ocd", "datalake_token"], config
@@ -297,7 +301,7 @@ class OrangeCyberDefense:
             x_opencti_order=99,
             x_opencti_color="#ff7900",
         )
-        self.datalake_instance = Datalake(longterm_token=self.ocd_datalake_token, env="preprod")
+        self.datalake_instance = Datalake(longterm_token=self.ocd_datalake_token, env=self.ocd_datalake_env)
         self.cache = {}
 
     def _generate_indicator_note(self, indicator_object):
