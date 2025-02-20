@@ -212,13 +212,13 @@ class OrangeCyberDefense:
             if os.path.isfile(config_file_path)
             else {}
         )
+        self.ocd_datalake_env = get_config_variable(
+            "OCD_DATALAKE_ENV", ["ocd", "datalake_env"], config
+        )
         self.helper = OpenCTIConnectorHelper(config)
         self.ocd_datalake_api_url = (
             "https://datalake.cert.orangecyberdefense.com/api/v3" if self.ocd_datalake_env == "prod" else
             "https://ti2.extranet.mrti-center.com/api/v3"
-        )
-        self.ocd_datalake_env = get_config_variable(
-            "OCD_DATALAKE_ENV", ["ocd", "datalake_env"], config
         )
         self.ocd_datalake_token = get_config_variable(
             "OCD_DATALAKE_TOKEN", ["ocd", "datalake_token"], config
