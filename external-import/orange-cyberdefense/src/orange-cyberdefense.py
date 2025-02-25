@@ -216,10 +216,6 @@ class OrangeCyberDefense:
             "OCD_DATALAKE_ENV", ["ocd", "datalake_env"], config
         )
         self.helper = OpenCTIConnectorHelper(config)
-        self.ocd_datalake_api_url = (
-            "https://datalake.cert.orangecyberdefense.com/api/v3" if self.ocd_datalake_env == "prod" else
-            "https://ti2.extranet.mrti-center.com/api/v3"
-        )
         self.ocd_datalake_token = get_config_variable(
             "OCD_DATALAKE_TOKEN", ["ocd", "datalake_token"], config
         )
@@ -457,21 +453,7 @@ class OrangeCyberDefense:
 
         for tag in tags:
             try:
-                url = f"{self.ocd_datalake_api_url}/mrti/threat-entity/filtered/"
-                payload = json.dumps(
-                    {
-                        "limit": "5000",
-                        "offset": "0",
-                        "tag": tag,
-                    }
-                )
-                headers = {
-                    "Accept": "application/stix+json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Token " + self.ocd_datalake_token,
-                }
-                response = requests.post(url, headers=headers, data=payload)
-                data = response.json()
+                data = self.datalake_instance.FilteredThreatEntity.get_filtered_and_sorted_list(limit=5000,offset=0,tag=tag,output=Output.STIX)
             except Exception as e:
                 self.helper.log_error(
                     "This tag cannot be found in Datalake: " + tag + "\n" + str(e)
@@ -852,23 +834,7 @@ class OrangeCyberDefense:
 
     def _import_threat_library(self):
         current_state = self.helper.get_state()
-
-        url = f"{self.ocd_datalake_api_url}/mrti/threat-entity/filtered/"
-        payload = json.dumps(
-            {
-                "limit": "500", 
-                "offset": "0", 
-                "ordering": "-updated_at",
-            }
-        )
-        headers = {
-            "Accept": "application/stix+json",
-            "Content-Type": "application/json",
-            "Authorization": "Token " + self.ocd_datalake_token,
-        }
-        threat_stix_bundle = requests.request(
-            "POST", url, headers=headers, data=payload
-        ).json()
+        threat_stix_bundle = self.datalake_instance.FilteredThreatEntity.get_filtered_and_sorted_list(limit=500,offset=0,ordering="-updated_at", output=Output.STIX)
         if threat_stix_bundle["objects"]:
             self._log_and_initiate_work("Threat Library")
             threat_stix_bundle["objects"] = [
