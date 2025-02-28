@@ -212,10 +212,11 @@ class OrangeCyberDefense:
             if os.path.isfile(config_file_path)
             else {}
         )
+        self.helper = OpenCTIConnectorHelper(config) # Set config, then overwrite some with env variables
+        
         self.ocd_datalake_env = get_config_variable(
             "OCD_DATALAKE_ENV", ["ocd", "datalake_env"], config
         )
-        self.helper = OpenCTIConnectorHelper(config)
         self.ocd_datalake_token = get_config_variable(
             "OCD_DATALAKE_TOKEN", ["ocd", "datalake_token"], config
         )
@@ -933,6 +934,12 @@ class OrangeCyberDefense:
                         )
                 if self.ocd_import_datalake:
                     try:
+                        self.helper.log_info(f"importing worldwatch,  : "
+                             f"self.ocd_import_worldwatch={self.ocd_import_worldwatch}"
+                             f"self.ocd_datalake_env={self.ocd_datalake_env}"
+                             f"self.ocd_import_threat_library={self.ocd_import_threat_library}"
+                             f"self.ocd_import_datalake={self.ocd_import_datalake}"
+                             )
                         self._import_datalake()
                     except Exception as ex:
                         self.helper.log_error(
